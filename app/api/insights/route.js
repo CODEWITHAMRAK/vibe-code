@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GoogleGenAI } from "@google/genai";
 
 export async function POST(req) {
     const { question, expenses } = await req.json();
@@ -19,72 +20,51 @@ export async function POST(req) {
         );
     }
 
-    const messages = [
-        {
-            role: "user",
-            parts: [{ text: question }],
-        },
-        {
-            role: "system",
-            parts: [
-                {
-                    text: `Analyze the following expenses and provide insights: ${JSON.stringify(
-                        expenses
-                    )}`,
-                },
-            ],
-        },
-    ];
+    const ai = new GoogleGenAI({ apiKey });
 
-    const body = JSON.stringify({
-        contents: messages,
-        generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-                type: "object",
-                properties: {
-                    insights: {
-                        type: "array",
-                        items: {
-                            type: "object",
-                            properties: {
-                                title: { type: "string" },
-                                description: { type: "string" },
-                            },
-                            required: ["title", "description"],
-                        },
+    const systemInstruction = `Analyze the following expenses and provide detailed financial insights and recommendations based on the user's question. The expenses provided are: ${JSON.stringify(
+        expenses
+    )}`;
+
+    const responseSchema = {
+        type: "object",
+        properties: {
+            insights: {
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        title: { type: "string" },
+                        description: { type: "string" },
                     },
+                    required: ["title", "description"],
                 },
-                required: ["insights"],
             },
         },
-    });
+        required: ["insights"],
+    };
 
     try {
-        const response = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-goog-api-key": apiKey,
-                },
-                body,
-            }
-        );
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: [{ role: "user", parts: [{ text: question }] }],
+            config: {
+                systemInstruction: systemInstruction,
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+            },
+        });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            return NextResponse.json(errorData, { status: response.status });
-        }
+        const jsonText = response.text.trim();
+        const parsedData = JSON.parse(jsonText);
 
-        const data = await response.json();
-        const insights =
-            data.candidates?.[0]?.content?.parts?.[0]?.json?.insights;
+        const insights = parsedData.insights;
 
         if (!insights) {
             return NextResponse.json(
-                { error: "No insights found in the response" },
+                {
+                    error: "No insights found in the response body from the model.",
+                },
                 { status: 500 }
             );
         }
@@ -93,7 +73,10 @@ export async function POST(req) {
     } catch (error) {
         console.error("Gemini API error:", error);
         return NextResponse.json(
-            { error: "Failed to fetch insights from Gemini API" },
+            {
+                error: "Failed to fetch insights from Gemini API",
+                details: error.message,
+            },
             { status: 500 }
         );
     }

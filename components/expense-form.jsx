@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Sparkles } from "lucide-react";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const CATEGORIES = [
     "Food",
@@ -39,9 +47,11 @@ export default function ExpenseForm({ onAddExpense }) {
             const data = await response.json();
             if (data.category) {
                 setCategory(data.category);
+                toast.success(`AI suggested category: ${data.category}`);
             }
         } catch (error) {
             console.error("Error suggesting category:", error);
+            toast.error("Failed to suggest category");
         } finally {
             setSuggestingCategory(false);
         }
@@ -58,6 +68,8 @@ export default function ExpenseForm({ onAddExpense }) {
             date,
             description,
         });
+
+        toast.success("Expense added successfully!");
 
         // Reset form
         setName("");
@@ -117,17 +129,19 @@ export default function ExpenseForm({ onAddExpense }) {
                                 : "AI Suggest"}
                         </button>
                     </div>
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 text-slate-900 dark:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        {CATEGORIES.map((cat) => (
-                            <option key={cat} value={cat}>
-                                {cat}
-                            </option>
-                        ))}
-                    </select>
+
+                    <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {CATEGORIES.map((cat) => (
+                                <SelectItem key={cat} value={cat}>
+                                    {cat}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>

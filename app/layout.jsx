@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-    title: "Team Arise",
-    description: "Team Arise's Codefury project",
+    title: "Fiscal Fox",
+    description: "Spend smart with fiscal fox",
 };
 
 export default function RootLayout({ children }) {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }) {
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <Toaster></Toaster>
+                <Toaster richColors></Toaster>
                 <ThemeProvider attribute={"class"}>
                     {children}
                 </ThemeProvider>
