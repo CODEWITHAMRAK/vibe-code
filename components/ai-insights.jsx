@@ -98,7 +98,7 @@ export default function AIChatbot() {
             <DialogContent className="w-[600px] h-[700px] flex flex-col rounded-xl shadow-xl p-4">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-white">
-                        AI Financial Assistant
+                        Fox AI Assistant
                     </DialogTitle>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         Ask questions about your expenses and get smart
