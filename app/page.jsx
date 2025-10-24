@@ -63,9 +63,16 @@ export default function Home() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex items-start justify-between mb-8">
                     <div>
-                        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-2">
-                            SpendSmart
-                        </h1>
+                        <div className="flex gap-2 items-center">
+                            <img
+                                src="/logo.jpg"
+                                alt="logo"
+                                className=" w-16 h-16 rounded-full"
+                            />
+                            <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-2">
+                                Fiscal Fox
+                            </h1>
+                        </div>
                         <p className="text-slate-600 dark:text-slate-400">
                             Track, categorize, and optimize your spending with
                             AI insights
